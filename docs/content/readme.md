@@ -32,6 +32,19 @@ KubeStellar is particularly beneficial if you're currently deploying in a single
 
 ![KubeStellar High Level View](./images/kubestellar-high-level.png)
 
+### Quick Start with Auto-Detection
+
+```shell
+# Clone and install with automatic KubeFlex detection
+git clone https://github.com/kubestellar/kubestellar.git
+cd kubestellar
+./scripts/install-core-chart.sh \
+  --set-json ITSes='[{"name":"its1"}]' \
+  --set-json WDSes='[{"name":"wds1"}]'
+```
+
+See [Core Chart Documentation](direct/core-chart.md) for more options.
+
 The use of multiple clusters offers several advantages, including:
 
 - Separation of environments (e.g., development, testing, staging)

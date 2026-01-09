@@ -27,7 +27,9 @@ verbosity:
 
 # KubeFlex override values
 kubeflex-operator:
-  install: true
+  install: true # enable/disable the installation of KubeFlex by the chart (default: true)
+                # Note: Use scripts/install-core-chart.sh for automatic detection
+                # or set to false manually when KubeFlex is already installed
   # installPostgreSQL: true # automatically install the appropriate version of PostgreSQL required by KubeFlex
   # isOpenShift: false # set this variable to true when installing the chart in an OpenShift cluster
   # domain: localtest.me # used to define the DNS domain name used from outside the KubeFlex hosting cluster to reach that cluster's Ingress endpoint

@@ -66,6 +66,60 @@ While not a complete list of supported hosting clusters, here we discuss how to 
 
     When using this option, one is required to explicitly set the `isOpenShift` variable to `true` by including `--set "kubeflex-operator.isOpenShift=true"` in the Helm chart installation command.
 
+## Smart Installation (Auto-Detection)
+
+KubeStellar provides a smart installation script that automatically detects if KubeFlex is already installed and adjusts the installation accordingly. This eliminates the need to manually specify `--set kubeflex-operator.install=false`.
+
+### Using the Smart Install Script
+
+The script is located at `scripts/install-core-chart.sh` and provides automatic detection:
+
+```shell
+# First installation - will install KubeFlex
+./scripts/install-core-chart.sh \
+  --set-json ITSes='[{"name":"its1"}]' \
+  --set-json WDSes='[{"name":"wds1"}]'
+
+# Add another WDS - will auto-detect existing KubeFlex and skip reinstallation
+./scripts/install-core-chart.sh \
+  --release-name add-wds2 \
+  --set-json WDSes='[{"name":"wds2"}]'
+```
+
+### Install from OCI Registry
+
+```shell
+# Install specific version with auto-detection
+./scripts/install-core-chart.sh \
+  --version $KUBESTELLAR_VERSION \
+  --set-json ITSes='[{"name":"its1"}]' \
+  --set-json WDSes='[{"name":"wds1"}]'
+```
+
+### How Auto-Detection Works
+
+The script checks if KubeFlex is installed by looking for:
+```shell
+kubectl get deployment -n kubeflex-system kubeflex-controller-manager
+```
+
+- **If found:** Sets `--set kubeflex-operator.install=false` automatically
+- **If not found:** Allows KubeFlex installation (default behavior)
+- **Override:** Use `--force-kubeflex-install` to install even if detected
+
+### Additional Options
+
+```shell
+# See all available options
+./scripts/install-core-chart.sh --help
+
+# Dry run to see what would be installed
+./scripts/install-core-chart.sh --dry-run --set-json ITSes='[{"name":"its1"}]'
+
+# Use custom namespace
+./scripts/install-core-chart.sh --namespace my-namespace --set-json ITSes='[{"name":"its1"}]'
+```
+
 ## KubeStellar Core Chart values
 
 The KubeStellar chart makes available to the user several values that may be used to customize its installation into an existing cluster:
@@ -173,6 +227,35 @@ WDSes: # all the CPs in this list will execute the transport-controller.yaml and
 where `name` must specify a name unique among all the control planes in that KubeFlex deployment (note that this must be unique among both ITSes and WDSes), the optional `type` can be either k8s (default) or host, see [here](https://github.com/kubestellar/kubeflex/blob/main/docs/users.md) for more information, the optional `APIGroups` provides a list of APIGroups, see [here](https://docs.kubestellar.io/release-{{ config.ks_latest_release }}/direct/examples/#scenario-2-using-the-hosting-cluster-as-wds-to-deploy-a-custom-resource) for more information, and `ITSName` specify the ITS connected to the new WDS being created (this parameter MUST be specified if more that one ITS exists in the cluster, if no value is specified and only one ITS exists in the cluster, then it will be automatically selected).
 
 ## KubeStellar Core Chart usage step by step
+
+### Option 1: Using the Smart Install Script (Recommended)
+
+The easiest way to install KubeStellar is using the smart installation script that handles KubeFlex detection automatically:
+
+```shell
+git clone https://github.com/kubestellar/kubestellar.git
+cd kubestellar
+
+# Install with auto-detection
+./scripts/install-core-chart.sh \
+  --set-json ITSes='[{"name":"its1"}]' \
+  --set-json WDSes='[{"name":"wds1"}]'
+```
+
+Or install from OCI registry:
+
+```shell
+./scripts/install-core-chart.sh \
+  --version $KUBESTELLAR_VERSION \
+  --set-json ITSes='[{"name":"its1"}]' \
+  --set-json WDSes='[{"name":"wds1"}]'
+```
+
+### Option 2: Direct Helm Installation
+
+If you prefer to use Helm directly, you need to manage the KubeFlex installation flag manually:
+
+**Note:** When using direct Helm installation, you must explicitly set `--set kubeflex-operator.install=false` if KubeFlex is already installed. The smart install script handles this automatically.
 
 The local copy of the core chart can be installed in an existing cluster using the commands:
 ```shell
