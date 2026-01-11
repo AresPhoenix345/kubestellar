@@ -319,6 +319,27 @@ After the initial installation is completed, there are two main ways to install 
       --set-json='WDSes=[{"name":"wds2"}]'
     ```
 
+#### Automatic KubeFlex Detection
+
+Starting from version X.X.X, the chart includes automatic detection of existing KubeFlex installations. If KubeFlex is already present in your cluster but `kubeflex-operator.install=true` (the default), you will see a warning message during installation:
+```
+================================================================================
+WARNING: KubeFlex operator appears to be already installed in this cluster!
+================================================================================
+```
+
+To suppress this warning and avoid potential conflicts, explicitly set:
+```bash
+--set kubeflex-operator.install=false
+```
+
+**When to set `kubeflex-operator.install=false`:**
+- Installing core-chart in a cluster where KubeFlex is already deployed
+- Adding additional WDSes to an existing KubeStellar deployment
+- Reinstalling or upgrading the core-chart
+
+**Note:** The chart checks for the `kubeflex-controller-manager` deployment in the `kubeflex-system` namespace to determine if KubeFlex is installed.
+
 ## Kubeconfig files and contexts for Control Planes
 
 It is convenient to use one kubeconfig file that has a context for

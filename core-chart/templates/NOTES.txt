@@ -1,3 +1,6 @@
+{{- include "kubestellar.kubeflex.installWarning" . }}
+KubeStellar {{ .Chart.AppVersion }} successfully installed!
+
 For your convenience you will probably want to add contexts to your
 kubeconfig named after the non-host-type control planes (WDSes and
 ITSes) that you just created (a host-type control plane is just an
